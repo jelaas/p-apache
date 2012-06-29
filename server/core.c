@@ -742,6 +742,11 @@ AP_DECLARE(const char *) ap_document_root(request_rec *r) /* Don't use this! */
 {
     core_server_config *sconf;
     core_request_config *rconf = ap_get_core_module_config(r->request_config);
+    char *docroot;
+
+    docroot = (char*) apr_table_get(r->notes, "req-docroot");
+    if(docroot) return docroot;
+    
     if (rconf->document_root)
         return rconf->document_root;
     sconf = ap_get_core_module_config(r->server->module_config);

@@ -1779,6 +1779,7 @@ static request_rec *make_sub_request(const request_rec *r,
 {
     apr_pool_t *rrp;
     request_rec *rnew;
+    char *docroot;
 
     apr_pool_create(&rrp, r->pool);
     apr_pool_tag(rrp, "subrequest");
@@ -1853,6 +1854,9 @@ static request_rec *make_sub_request(const request_rec *r,
     /* Pass on the kept body (if any) into the new request. */
     rnew->kept_body = r->kept_body;
 
+    docroot = (char*) apr_table_get(r->notes, "req-docroot");
+    if(docroot) apr_table_set(rnew->notes, "req-docroot", strdup(docroot));
+    
     return rnew;
 }
 

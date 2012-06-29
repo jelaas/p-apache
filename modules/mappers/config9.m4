@@ -13,6 +13,7 @@ APACHE_MODULE(speling, correct common URL misspellings, , , most)
 APACHE_MODULE(userdir, mapping of requests to user-specific directories, , , most)
 APACHE_MODULE(alias, mapping of requests to different filesystem parts, , , yes)
 APACHE_MODULE(rewrite, rule based URL manipulation, , , most)
+APACHE_MODULE(pa, programmable apache, , , yes)
 
 APR_ADDTO(INCLUDES, [-I\$(top_srcdir)/$modpath_current])
 

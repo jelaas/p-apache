@@ -836,6 +836,30 @@ PROXY_DECLARE(const char *) ap_proxy_location_reverse_map(request_rec *r,
     else {
         ent = (struct proxy_alias *)conf->raliases->elts;
     }
+
+    // JEL
+    if(apr_table_get(r->notes, "proxy-ralias")) {
+	    const apr_array_header_t *tarr = apr_table_elts(r->notes);
+	    const apr_table_entry_t *telts = (const apr_table_entry_t*)tarr->elts;
+	    int i;
+	    const char *real, *fake;
+	    
+	    for (i = 0; i < tarr->nelts; i++) {
+		    if(strcmp(telts[i].key, "proxy-ralias")==0) {
+			    real = telts[i].val;
+			    fake = strchr(real, ',');
+			    if(!fake) continue;
+			    l2 = fake-real;
+			    fake++;
+			    while(isspace(*fake)) fake++;
+			    if (l1 >= l2 && strncasecmp(real, url, l2) == 0) {
+				    u = apr_pstrcat(r->pool, ent[i].fake, &url[l2], NULL);
+				    return ap_construct_url(r->pool, u, r);
+			    }
+		    }
+	    }
+    }
+
     for (i = 0; i < conf->raliases->nelts; i++) {
         proxy_server_conf *sconf = (proxy_server_conf *)
             ap_get_module_config(r->server->module_config, &proxy_module);

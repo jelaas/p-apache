@@ -807,6 +807,10 @@ int ap_proxy_http_request(apr_pool_t *p, request_rec *r,
     ap_xlate_proto_to_ascii(buf, strlen(buf));
     e = apr_bucket_pool_create(buf, strlen(buf), p, c->bucket_alloc);
     APR_BRIGADE_INSERT_TAIL(header_brigade, e);
+    if((buf = apr_table_get(r->notes, "proxy-host"))) {
+	    if(strncmp(buf, "Host:", 5))
+		    buf = apr_pstrcat(p, "Host: ", buf, CRLF, NULL);
+    } else {
     if (dconf->preserve_host == 0) {
         if (ap_strchr_c(uri->hostname, ':')) { /* if literal IPv6 address */
             if (uri->port_str && uri->port != DEFAULT_HTTP_PORT) {
@@ -839,6 +843,7 @@ int ap_proxy_http_request(apr_pool_t *p, request_rec *r,
         }
         buf = apr_pstrcat(p, "Host: ", hostname, CRLF, NULL);
     }
+	    }
     ap_xlate_proto_to_ascii(buf, strlen(buf));
     e = apr_bucket_pool_create(buf, strlen(buf), p, c->bucket_alloc);
     APR_BRIGADE_INSERT_TAIL(header_brigade, e);
@@ -1284,7 +1289,7 @@ static request_rec *make_fake_req(conn_rec *c, request_rec *r)
     rp->subprocess_env  = apr_table_make(pool, 50);
     rp->headers_out     = apr_table_make(pool, 12);
     rp->err_headers_out = apr_table_make(pool, 5);
-    rp->notes           = apr_table_make(pool, 5);
+    rp->notes           = apr_table_copy(pool, r->notes);
 
     rp->server = r->server;
     rp->log = r->log;

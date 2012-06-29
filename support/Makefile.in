@@ -3,7 +3,7 @@ DISTCLEAN_TARGETS = apxs apachectl dbmmanage log_server_status \
 
 CLEAN_TARGETS = suexec
 
-bin_PROGRAMS = htpasswd htdigest htdbm firehose ab logresolve httxt2dbm
+bin_PROGRAMS = htpasswd htdigest htdbm firehose ab logresolve httxt2dbm pacc
 sbin_PROGRAMS = htcacheclean rotatelogs $(NONPORTABLE_SUPPORT)
 TARGETS  = $(bin_PROGRAMS) $(sbin_PROGRAMS)
 
@@ -17,7 +17,11 @@ install:
 	@test -d $(DESTDIR)$(sbindir) || $(MKINSTALLDIRS) $(DESTDIR)$(sbindir)
 	@test -d $(DESTDIR)$(libexecdir) || $(MKINSTALLDIRS) $(DESTDIR)$(libexecdir)
 	@cp -p $(top_builddir)/server/httpd.exp $(DESTDIR)$(libexecdir)
-	@for i in apxs dbmmanage; do \
+	@cp -p $(builddir)/pa.c $(DESTDIR)$(libexecdir)
+	@chmod 644 $(DESTDIR)$(libexecdir)/pa.c
+	@cp -p $(builddir)/pa.h $(DESTDIR)$(libexecdir)
+	@chmod 644 $(DESTDIR)$(libexecdir)/pa.h
+	@for i in apxs dbmmanage pacc; do \
 	    if test -f "$(builddir)/$$i"; then \
 	        cp -p $$i $(DESTDIR)$(bindir); \
 	        chmod 755 $(DESTDIR)$(bindir)/$$i; \
@@ -35,6 +39,10 @@ install:
 	        cp -p envvars-std $(DESTDIR)$(sbindir)/envvars ; \
 	    fi ; \
 	fi
+
+pacc_OBJECTS = pacc.lo
+pacc: $(pacc_OBJECTS)
+	$(LINK) $(pacc_LTFLAGS) $(pacc_OBJECTS)
 
 htpasswd_OBJECTS = htpasswd.lo
 htpasswd: $(htpasswd_OBJECTS)
