@@ -60,6 +60,14 @@ int main(int argc, char **argv)
 	unsigned long checksum = 0;
 	unsigned long checksum2 = 0;
 
+	if(argc < 2) {
+	usage:
+		fprintf(stderr, "Usage: pacc <config>.conf\n");
+		exit(1);
+	}
+	if(!strcmp(argv[1], "-h")) goto usage;
+	if(!strcmp(argv[1], "--help")) goto usage;
+
 	now = time(0);
 	compiledate = asctime(gmtime(&now));
 	p =strchr(compiledate, '\n');
