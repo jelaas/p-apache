@@ -144,13 +144,18 @@ int path(const char *path)
 
 /*
  * Return true if the path component of the URI begins with 'path'.
+ * If the prefix matches the rest of the DOCUMENT_URI is placed in recording[0].
  */
 int path_prefix(const char *path)
 {
 	char *u = DOCUMENT_URI;
 	if(!u) return 0;
 	if(_rf_debug) fprintf(stderr, "path_prefix() strncmp(\"%s\", \"%s\", %d) == %d\n", path, u, strlen(path), strncmp(path, u, strlen(path)));
-        return strncmp(path, u, strlen(path))==0;
+        if(strncmp(path, u, strlen(path)))
+		return 0;
+	strncpy(recording[0], u + strlen(path), RECSIZE-1);
+	recording[0][RECSIZE]=0;
+	return 1;
 }
 
 /*
