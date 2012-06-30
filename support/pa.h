@@ -125,7 +125,7 @@ int _serve_file(const char *filepath, ...);
  * Execute specific CGI
  */
 int _exec_cgi(const char *cgipath, ...);
-#define exec_cgi(filepath, A...) _serve_file(filepath, ##A, NULL)
+#define exec_cgi(filepath, A...) _exec_cgi(filepath, ##A, NULL)
 
 /*
  * set incoming host header and switch vhost
