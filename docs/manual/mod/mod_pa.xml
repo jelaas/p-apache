@@ -67,9 +67,9 @@ a directory</description>
 httpd.conf
 ----------
 
-ReqFilter <prg> invoked for each request. Env contains request informaton.
-ReqFilterError <prg> invoked if error. Env contains information about failed request.
-ReqFilterLogLevel (DEBUG|INFO|WARN|ERR)
+PAConfig <prg> invoked for each request. Env contains request informaton.
+PAError <prg> invoked if error. Env contains information about failed request.
+PALogLevel (DEBUG|INFO|WARN|ERR)
 
 
 Output from your ReqFilter program:

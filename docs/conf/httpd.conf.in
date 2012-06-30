@@ -31,6 +31,23 @@
 ServerRoot "@@ServerRoot@@"
 
 #
+# PAConfig: Programmable config executable
+#
+PAConfig @@ServerRoot@@/conf/paconfig.pa
+
+#
+# PAError: Request error handler executable.
+# Uncomment for error handling. You need this if you want to be able
+# to fail proxy-backends.
+#
+# PAError @@ServerRoot@@/conf/paerror.pa
+
+#
+# PALogLevel: Log-level for PA.
+#
+PALogLevel warn
+
+#
 # Mutex: Allows you to set the mutex mechanism and mutex file directory
 # for individual mutexes, or change the global defaults
 #
