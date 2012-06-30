@@ -33,14 +33,14 @@ ServerRoot "@@ServerRoot@@"
 #
 # PAConfig: Programmable config executable
 #
-PAConfig @@ServerRoot@@/conf/paconfig.pa
+PAConfig @rel_sysconfdir@/paconfig.pa
 
 #
 # PAError: Request error handler executable.
 # Uncomment for error handling. You need this if you want to be able
 # to fail proxy-backends.
 #
-# PAError @@ServerRoot@@/conf/paerror.pa
+# PAError @rel_sysconfdir@/paerror.pa
 
 #
 # PALogLevel: Log-level for PA.
