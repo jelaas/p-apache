@@ -151,7 +151,7 @@ int path_prefix(const char *path)
 {
 	char *u = DOCUMENT_URI;
 	if(!u) return 0;
-	if(_rf_debug) fprintf(stderr, "path_prefix() strncmp(\"%s\", \"%s\", %d) == %d\n", path, u, strlen(path), strncmp(path, u, strlen(path)));
+	if(_rf_debug) fprintf(stderr, "path_prefix() strncmp(\"%s\", \"%s\", %zd) == %d\n", path, u, strlen(path), strncmp(path, u, strlen(path)));
         if(strncmp(path, u, strlen(path)))
 		return 0;
 	strncpy(recording[0], u + strlen(path), RECSIZE-1);
@@ -217,7 +217,7 @@ int _path_match( const char *noop, ...)
 			else
 				cmpstatus = 1;
 		} else {
-			if(_rf_debug) fprintf(stderr, "path_match() strncmp(\"%s\", \"%s\", %d) == %d\n",
+			if(_rf_debug) fprintf(stderr, "path_match() strncmp(\"%s\", \"%s\", %zd) == %d\n",
 					      path, pe, strlen(pe), strncmp(path, pe, strlen(pe)));
 			if(strncmp(path, pe, strlen(pe))==0) {
 				cmpstatus=1;
