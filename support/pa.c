@@ -33,6 +33,7 @@
 char recording[NRECORDS][RECSIZE];
 char regex_group[NRECORDS][RECSIZE];
 char *DOCUMENT_URI;
+char *HTTPS;
 char *QUERY_STRING;
 int get, post, head, put, http, https, protocol;
 
@@ -830,6 +831,7 @@ void _rf_init()
 {
 	char *method, *proto;
 	DOCUMENT_URI = getenv("DOCUMENT_URI");
+	HTTPS = getenv("HTTPS");
 	QUERY_STRING = getenv("QUERY_STRING");
 	method = getenv("method");
 	proto = getenv("protocol");

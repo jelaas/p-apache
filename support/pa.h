@@ -12,7 +12,7 @@
 #ifndef PA_INTERNAL
 extern char recording[NRECORDS][RECSIZE];
 char regex_group[NRECORDS][RECSIZE];
-extern char *DOCUMENT_URI;
+extern char *DOCUMENT_URI, *HTTPS;
 char *QUERY_STRING;
 extern int get, post, head, put, http, https, protocol;
 #endif
