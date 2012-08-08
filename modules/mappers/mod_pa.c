@@ -55,9 +55,15 @@ typedef struct pa_cfg {
 
 module AP_MODULE_DECLARE_DATA pa_module;
 
+static APR_OPTIONAL_FN_TYPE(ssl_is_https) *pa_is_https = NULL;
+
 static void *pa_create_server_config(apr_pool_t *p, server_rec *s)
 {
     pa_cfg *cfg;
+
+    if(!pa_is_https)
+	    pa_is_https = APR_RETRIEVE_OPTIONAL_FN(ssl_is_https);
+
     cfg = (pa_cfg *) apr_pcalloc(p, sizeof(pa_cfg));
     cfg->loglevel = APLOG_WARNING;
     return (void *) cfg;
@@ -137,7 +143,9 @@ static const char **pa_make_env(request_rec *r)
 							    "client_ip=",
 							    r->connection->client_ip, NULL);
 	*(const char**)apr_array_push(envarr) = apr_pstrcat(r->pool, "local_ip=", r->connection->local_ip, NULL);
-
+	if(pa_is_https && pa_is_https(r->connection))
+		*(const char**)apr_array_push(envarr) = "HTTPS=on";
+	
 	/* create envp. size of array */
 	envp = apr_pcalloc(r->pool, sizeof(char*) * (envarr->nelts + 1));
 	
@@ -172,6 +180,11 @@ static const char **pa_make_err_env(request_rec *r)
 							    "client_ip=",
 							    r->connection->client_ip, NULL);
 	*(const char**)apr_array_push(envarr) = apr_pstrcat(r->pool, "local_ip=", r->connection->local_ip, NULL);
+
+	if(pa_is_https && pa_is_https(r->connection))
+		*(const char**)apr_array_push(envarr) = "HTTPS=on";
+
+	*(const char**)apr_array_push(envarr) = "PAERROR=1";
 
 	proxy = apr_table_get(r->notes, "proxy-host");
 	if(proxy)

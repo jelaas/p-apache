@@ -97,6 +97,7 @@ Log=MSG           -- Log message MSG to apache log
 
 Environment variables set for invoked ReqFilter program
 -------------------------------------------------------
+HTTPS            -- Set to "on" if HTTPS is active.
 IN::<header>     -- One variable for each input header in request.
 DOCUMENT_URI     -- Document path requested
 QUERY_STRING     -- What comes after requestpath (after '?').
@@ -106,7 +107,8 @@ servername       -- Name of the server according to apache
 useragent_ip        -- Client IP address
 useragent_addr        -- Client IP address
 local_ip         -- Server IP address
-status         -- Status of the response. Only for ReqFilterError.
+PAERROR          -- Set to "1". Only for ReqFilterError.
+status           -- Status of the response. Only for ReqFilterError.
 FILENAME         -- Absolute path to file. Only for ReqFilterError.
 PROXY_HOST       -- Hostname for proxyrequest. Only for ReqFilterError.
 
