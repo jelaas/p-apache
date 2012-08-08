@@ -610,6 +610,10 @@ static const char *pa_cmd_log(cmd_parms *parms, void *dummy, const char *arg)
 		cfg->loglevel = APLOG_WARNING;
 		return NULL;
 	}
+	if(!apr_strnatcasecmp(arg, "WARN")) {
+		cfg->loglevel = APLOG_WARNING;
+		return NULL;
+	}
 	if(!apr_strnatcasecmp(arg, "ERROR")) {
 		cfg->loglevel = APLOG_ERR;
 		return NULL;
