@@ -45,6 +45,8 @@
 
 #include "apr_strings.h"
 
+#include "mod_ssl.h"
+
 #include <stdio.h>
 
 typedef struct pa_cfg {
