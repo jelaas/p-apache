@@ -185,6 +185,7 @@ int main(int argc, char **argv)
 		printf("Failed link:\n  %s\n", cmd);
 		exit(1);
 	}
+	printf("Generated compiled configuration: '%s'\n", fn.bin);
 	
 	exit(0);
 }
