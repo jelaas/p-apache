@@ -853,12 +853,12 @@ static int printenv(int fd, const char *env)
 {
 	char *p;
 	p = getenv(env);
-	write(fd, env, strlen(env));
+	if(write(fd, env, strlen(env)) == -1) return -1;
 	if(p) {
-		write(fd, "=", 1);
-		write(fd, p, strlen(p));
+		if(write(fd, "=", 1) == -1) return -1;
+		if(write(fd, p, strlen(p)) == -1) return -1;
 	}
-	write(fd, "\n", 1);
+	if(write(fd, "\n", 1) == -1) return -1;
 	return 0;
 }
 
@@ -871,14 +871,16 @@ int dump(const char *fn)
 	fd = open(fn, O_WRONLY|O_CREAT|O_TRUNC, 0600);
 	if(fd < 0) return -1;
 	
-	printenv(fd, "DOCUMENT_URI");
-	printenv(fd, "IN::Host");
-	printenv(fd, "QUERY_STRING");
-	printenv(fd, "method");
-	printenv(fd, "protocol");
-	printenv(fd, "servername");
-	printenv(fd, "remote_ip");
+	if(printenv(fd, "DOCUMENT_URI")) goto out;
+	if(printenv(fd, "IN::Host")) goto out;
+	if(printenv(fd, "QUERY_STRING")) goto out;
+	if(printenv(fd, "method")) goto out;
+	if(printenv(fd, "protocol")) goto out;
+	if(printenv(fd, "servername")) goto out;
+	if(printenv(fd, "remote_ip")) goto out;
+	if(printenv(fd, "HTTPS")) goto out;
 	printenv(fd, "local_ip");
+out:
 	close(fd);
 	return 0;
 }
