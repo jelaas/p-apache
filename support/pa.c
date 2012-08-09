@@ -155,7 +155,7 @@ int path_prefix(const char *path)
         if(strncmp(path, u, strlen(path)))
 		return 0;
 	strncpy(recording[0], u + strlen(path), RECSIZE-1);
-	recording[0][RECSIZE]=0;
+	recording[0][RECSIZE-1]=0;
 	return 1;
 }
 
