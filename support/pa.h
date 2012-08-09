@@ -26,7 +26,7 @@ int dump(const char *filename);
  * msg: Log message
  */
 int _msg( const char *message, ...);
-#define msg(A...) _msg(##A, NULL)
+#define msg(MSG, A...) _msg(MSG, ##A, NULL)
 
 /*
  * Query hostname DNS-format.
