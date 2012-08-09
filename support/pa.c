@@ -886,9 +886,16 @@ int dump(const char *fn)
 /*
  * msg: Log message
  */
-int msg(const char *message)
+int _msg(const char *message, ...)
 {
-	printf("Log=%s\n", message);
+	const char *m;
+        va_list ap;
+
+	va_start(ap, message);
+	m = _va_buf(&ap);
+	va_end(ap);
+
+	printf("Log=%s%s\n", message, m);
 	return 0;
 }
 
