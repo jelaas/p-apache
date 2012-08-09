@@ -33,19 +33,19 @@ ServerRoot "@@ServerRoot@@"
 #
 # PAConfig: Programmable config executable
 #
-PAConfig @rel_sysconfdir@/paconfig.pa
+PAConfig @@ServerRoot@@/@rel_sysconfdir@/paconfig.pa
 
 #
 # PAError: Request error handler executable.
 # Uncomment for error handling. You need this if you want to be able
 # to fail proxy-backends.
 #
-# PAError @rel_sysconfdir@/paerror.pa
+# PAError @@ServerRoot@@/@rel_sysconfdir@/paerror.pa
 
 #
 # PALogLevel: Log-level for PA.
 #
-PALogLevel warn
+PALogLevel warning
 
 #
 # Mutex: Allows you to set the mutex mechanism and mutex file directory
@@ -411,9 +411,9 @@ LogLevel warn
 #Include @rel_sysconfdir@/extra/httpd-policy.conf
 
 # Configure mod_proxy_html to understand HTML4/XHTML1
-<IfModule proxy_html_module>
-Include @rel_sysconfdir@/extra/proxy-html.conf
-</IfModule>
+#<IfModule proxy_html_module>
+#Include @rel_sysconfdir@/extra/proxy-html.conf
+#</IfModule>
 
 # Secure (SSL/TLS) connections
 #Include @rel_sysconfdir@/extra/httpd-ssl.conf
