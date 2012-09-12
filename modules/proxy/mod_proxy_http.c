@@ -2236,6 +2236,16 @@ static int proxy_http_handler(request_rec *r, proxy_worker *worker,
             if ((status = ap_proxy_connection_create(proxy_function, backend,
                                                      c, r->server)) != OK)
                 break;
+
+	    {
+		    char *timeout = (char*) apr_table_get(r->notes, "req-timeout");
+		    if(timeout) {
+			    apr_interval_time_t us;
+			    us = apr_time_from_sec(atoi(timeout));
+			    apr_socket_timeout_set(ap_get_conn_socket(backend->connection), us);
+		    }
+	    }
+
             /*
              * On SSL connections set a note on the connection what CN is
              * requested, such that mod_ssl can check if it is requested to do

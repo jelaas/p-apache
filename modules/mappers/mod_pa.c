@@ -206,12 +206,27 @@ static const char **pa_make_err_env(request_rec *r)
 static int pa_translate(request_rec *r)
 {
 	pa_cfg *cfg;
-	char *filename, *cgi, *docroot;
+	char *filename, *cgi, *docroot, *timeout;
 
 	cfg = ap_get_module_config(r->server->module_config, &pa_module);
 	if(!cfg->prg) return DECLINED;
 	
 	docroot = (char*) apr_table_get(r->notes, "req-docroot");
+
+	timeout = (char*) apr_table_get(r->notes, "req-timeout");
+	if(timeout) {
+		apr_interval_time_t us;
+		if(cfg->loglevel >= APLOG_DEBUG) {
+			apr_socket_timeout_get(ap_get_conn_socket(r->connection), &us);
+			ap_log_error(APLOG_MARK, APLOG_WARNING, 0, r->server,
+				     "pa_translate: timeout is: %lld", us);
+		}
+		us = apr_time_from_sec(atoi(timeout));
+		apr_socket_timeout_set(ap_get_conn_socket(r->connection), us);
+		if(cfg->loglevel >= APLOG_DEBUG) 
+			ap_log_error(APLOG_MARK, APLOG_WARNING, 0, r->server,
+				     "pa_translate: timeout set: %lld", us);
+	}
 
 	filename = (char*) apr_table_get(r->notes, "req-filename");
 	if(filename) {
@@ -254,6 +269,7 @@ static int pa_post_read_request(request_rec *r)
 	char *status = NULL;
 	char *pathinfo = NULL;
 	char *hostname = NULL;
+	char *timeout = NULL;
 	
 	cfg = ap_get_module_config(r->server->module_config, &pa_module);
 
@@ -390,6 +406,11 @@ static int pa_post_read_request(request_rec *r)
 					continue;
 				}
 				
+				if(strncmp(buf, "Timeout=", 8)==0) {
+					timeout = apr_pstrdup( r->pool, buf+8 );
+					continue;
+				}
+				
 				if(strncmp(buf, "CGI=", 4)==0) {
 					cgi = apr_pstrdup( r->pool, buf+4 );
 					continue;
@@ -455,6 +476,9 @@ static int pa_post_read_request(request_rec *r)
 						continue;
 					}
 				}
+				ap_log_error(APLOG_MARK, APLOG_WARNING, 0, r->server,
+					     "pa: unsupported directive: \"%s\"", buf);
+
 			}
 			
 			apr_file_close(proc->out);
@@ -484,6 +508,25 @@ static int pa_post_read_request(request_rec *r)
 		r->per_dir_config = r->server->lookup_defaults;
 		if(cfg->loglevel >= APLOG_DEBUG) 
 			ap_log_error(APLOG_MARK, APLOG_WARNING, 0, r->server, "pa: vhost change to %s", hostname);
+	}
+
+	{
+		if(timeout) { 
+			apr_interval_time_t us;
+			
+			if(cfg->loglevel >= APLOG_DEBUG) {
+				apr_socket_timeout_get(ap_get_conn_socket(r->connection), &us);
+				ap_log_error(APLOG_MARK, APLOG_WARNING, 0, r->server,
+					     "pa: timeout is: %lld", us);		
+			}
+			
+			us = apr_time_from_sec(atoi(timeout));
+			apr_socket_timeout_set(ap_get_conn_socket(r->connection), us);
+			if(cfg->loglevel >= APLOG_DEBUG) 
+				ap_log_error(APLOG_MARK, APLOG_WARNING, 0, r->server,
+					     "pa: timeout set: %lld", us);
+			apr_table_set(r->notes, "req-timeout", timeout);
+		}
 	}
 	
 	/* redirect this via proxy module */

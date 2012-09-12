@@ -827,6 +827,12 @@ matched:
 }
 
 
+int timeout(int t)
+{
+	printf("Timeout=%d\n", t);
+	return 0;
+}
+
 void _rf_init()
 {
 	char *method, *proto;

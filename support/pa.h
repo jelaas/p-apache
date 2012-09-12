@@ -129,6 +129,11 @@ int _exec_cgi(const char *cgipath, ...);
 #define exec_cgi(filepath, A...) _exec_cgi(filepath, ##A, NULL)
 
 /*
+ * Set timeout
+ */
+int timeout(int t);
+
+/*
  * set incoming host header and switch vhost
  */
 int _change_vhost(const char *hostname, ...);
