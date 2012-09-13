@@ -204,6 +204,15 @@ static int ap_proxy_ajp_request(apr_pool_t *p, request_rec *r,
      * Send the AJP request to the remote server
      */
 
+    {
+	    char *timeout = (char*) apr_table_get(r->notes, "req-timeout");
+	    if(timeout) {
+		    apr_interval_time_t us;
+		    us = apr_time_from_sec(atoi(timeout));
+		    apr_socket_timeout_set(conn->sock, us);
+	    }
+    }
+
     /* send request headers */
     status = ajp_send_header(conn->sock, r, maxsize, uri);
     if (status != APR_SUCCESS) {
