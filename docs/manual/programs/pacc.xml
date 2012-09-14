@@ -1,0 +1,316 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE manualpage SYSTEM "../style/manualpage.dtd">
+<?xml-stylesheet type="text/xsl" href="../style/manual.en.xsl"?>
+<!-- $LastChangedRevision$ -->
+
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<manualpage metafile="pacc.xml.meta">
+<parentdocument href="./">Programs</parentdocument>
+
+<title>pacc - Compile Apache configuration</title>
+
+<identifier>pacc</identifier>
+
+<summary>
+<p>Utility program for compiling P-Apache pa-C configuration files.</p>
+</summary>
+<seealso><module>mod_pa</module></seealso>
+
+<section id="synopsis"><title>Synopsis</title>
+    <p><code><strong>pacc</strong>
+<var>configfile</var></code></p>
+</section>
+
+<section id="pac"><title>pa-C</title>
+<p>
+pa-C is the augmented C language for P-Apache configuration.
+A pa-C file consists of C-code that may reference pa-C specific helper functions.
+When you compile a pa-C configuration all the configuration code in the pa-C file is embedded inside the C-language main() function and then linked against the pa-C helper functions implementation.
+</p>
+
+<dl>
+<dt>
+int dump(const char *filename)
+</dt>
+<dd>
+Dump state of environmenal variables to <var>filename</var> for debugging purposes.
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>
+int msg( const char *message, ...)
+</dt>
+<dd>
+Asks mod_pa to log a message to the errorlog.
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>
+int host(const char *hostname)
+</dt>
+<dd>
+Query hostname DNS-format.
+<example><title>Example</title>
+host("www.aaa.bb")
+</example>
+</dd>
+
+<dt>
+int path(const char *path)
+</dt>
+<dd>
+Return true if the path component of the URI equals 'path'.
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int path_prefix(const char *path)</dt>
+<dd>
+Return true if the path component of the URI begins with 'path'.
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int path_match( const char *noop, ...)</dt>
+<dd>
+Path matching.
+If arg matches the search (and path position) advances to the next arg.
+If an arg does not match, the next arg is tried against the same position in path.
+The last arg MUST match.
+If the last arg matches the function returns true.
+If arg is RECSTART then everything that matches in path is stored in the global variable recording[n], until RECSTOP.
+The index [n] is increased with every encounter of RECSTART.
+<example><title>Example</title>
+path_match("/", "dir/", RECSTART, "favicon.ico", RECSTOP))
+</example>
+</dd>
+
+<dt>int regex(const char *buffer, const char *expr)</dt>
+<dd>
+Generic regexp.
+Matching groups are stored in regex_group[].
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int path_regex(const char *expr)</dt>
+<dd>
+Regexp match of path component of the URI.
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int document_root(const char *path)</dt>
+<dd>
+Set document root for request.
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int proxy_host(const char *hostname)</dt>
+<dd>
+The hostname to send for a proxy-request.
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int proxy_reverse(const char *real, const char *fake)</dt>
+<dd>
+Reverse proxy translation.
+<example><title>Example</title>
+</example>
+</dd>
+
+</dl>
+
+<dt>int proxy_to(const char *URI, ...)</dt>
+<dd>
+Proxy request.
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int balancer_storage(const char *path)</dt>
+<dd>
+Path to balancer filesystem storage.
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int backend(const char *set, const char *uri)</dt>
+<dd>
+Define a balancer backend.
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>const char *backend_select(const char *set)</dt>
+<dd>
+Select a backend from a set.
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int backend_fail(const char *set, const char *uri)</dt>
+<dd>
+Fail a backend
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int redirect_to(const char *URI, ...)</dt>
+<dd>
+Redirect client
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int serve_file(const char *filepath, ...)</dt>
+<dd>
+Serve specific file.
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int exec_cgi(const char *cgipath, ...)</dt>
+<dd>
+Execute specific CGI.
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int timeout(int t)</dt>
+<dd>
+Set timeout.
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int change_vhost(const char *hostname, ...)</dt>
+<dd>
+set incoming host header and switch vhost.
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int add_filter(const char *filtername)</dt>
+<dd>
+ add output filter named 'filtername' to request
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int return_status(int status)</dt>
+<dd>
+return HTTP status NNN to client
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int substitute_text(const char *real, const char *fake)</dt>
+<dd>
+replace occurances of real with fake within the output document
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int set_handler(const char *handler)</dt>
+<dd>
+set handler to 'handler'
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int export_var(const char *name, const char *value, ...)</dt>
+<dd>
+export variable to CGI
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int set_query_string(const char *value, ...)</dt>
+<dd>
+set HTTP query string to 'S'
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int set_path_info(const char *value, ...)</dt>
+<dd>
+PATH_INFO=PATH   -- set PATH_INFO for CGI.
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int set_header(int type, const char *name, const char *value, ...)</dt>
+<dd>
+set header named 'name' to 'value'
+type = IN|OUT|ERR
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int cookie(const char *name, ...)</dt>
+<dd>
+Compare value of cookie named 'name' with value.
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>int query_field(const char *field, ...)</dt>
+<dd>
+Compare value of query_string field
+The empty string matches field that is present but without a value
+<example><title>Example</title>
+</example>
+</dd>
+
+<dt>void done()</dt>
+<dd>
+We are done processing and return to the request handling.
+<example><title>Example</title>
+</example>
+</dd>
+
+
+<code>
+<pre>
+
+</pre>
+</code>
+</section>
+
+<section id="examples"><title>Examples</title>
+<example>
+<code>
+<pre>
+pacc laas.conf
+&gt;&gt; gcc -c -DPA_INTERNAL -Wall -Os -I/opt/apache/modules /opt/apache/modules/pa.c -o /tmp/pa.o
+pa.o compiled
+&gt;&gt; gcc -c -Wall -Os -I/opt/apache/modules /tmp/paconfig.conf.c -o /tmp/paconfig.conf.o
+&gt;&gt; gcc -static -o laas.pa /tmp/paconfig.conf.o /tmp/pa.o -lpcre
+Generated compiled configuration: 'paconfig.pa'
+</pre>
+</code>
+</example>
+</section>
+
+</manualpage>

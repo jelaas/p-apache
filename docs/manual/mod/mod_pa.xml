@@ -39,22 +39,70 @@ The program receives request information in environment variables.</p>
 
 <p>Example of how a configuration might look like.</p>
 <code>
+<pre>
 if(host("www.some.where")) {
                 proxy_host("www.some.where");
                 proxy_to("http://some.where.else/path/", DOCUMENT_URI);
                 done();
         }
 }
+</pre>
 </code>
+<p>
+The recommended way to write and compile you mod_pa configuration is by using <module>pacc</module>.
+</p>
 </summary>
+
+<directivesynopsis>
+<name>PAError</name>
+<description>Configure program to be invoked for on error. Env contains informaton about failed request.</description>
+<syntax>PAError
+    <var>prg</var></syntax>
+<default>PAError SYSCONFDIR/paerror.pa</default>
+<contextlist><context>server config</context>
+</contextlist>
+<usage>
+    <p>The <directive>PAError</directive> directive sets the
+    program to be invoked after a failed request.</p>
+
+    <example><title>Example</title>
+    <highlight language="config">
+      PAError /etc/httpd/conf/paerror.pa
+      </highlight>
+    </example>
+
+In addition to all of the environment variables set for paconfig, paerror has the following variables set for invocation
+<table border="1" style="zebra">
+<tr><td>PAERROR</td><td>Set to "1"</td></tr>
+<tr><td>status</td><td>Status of the response</td></tr>
+<tr><td>FILENAME</td><td>Absolute path to file</td></tr>
+<tr><td>PROXY_HOST</td><td>Hostname for proxyrequest</td></tr>
+</table>
+
+</usage>
+</directivesynopsis>
+
+<directivesynopsis>
+<name>PALogLevel</name>
+<description>Loglevel to use when logging</description>
+<syntax>PALogLevel
+    <var>DEBUG|INFO|WARN|ERR</var></syntax>
+<default>PALogLevel WARN</default>
+<contextlist><context>server config</context>
+</contextlist>
+<usage>
+    <p>The <directive>PALogLevel</directive> directive sets the loglevel to be used by mod_pa when logging.
+    </p>
+</usage>
+</directivesynopsis>
 
 <directivesynopsis>
 <name>PAConfig</name>
 <description>Configure program to be invoked for each request. Env contains request informaton.</description>
 <syntax>PAConfig
     <var>prg</var></syntax>
-<default>PAConfig SYSCONFDIR/paconfig.conf</default>
-<contextlist><context>server config</context><context>virtual host</context>
+<default>PAConfig SYSCONFDIR/paconfig.pa</default>
+<contextlist><context>server config</context>
 </contextlist>
 
 <usage>
@@ -63,59 +111,53 @@ if(host("www.some.where")) {
 
     <example><title>Example</title>
     <highlight language="config">
-      PAConfig /etc/httpd/conf/paconfig.conf
+      PAConfig /etc/httpd/conf/paconfig.pa
       </highlight>
     </example>
 
-httpd.conf
-----------
+The following environment variables are set for invoked paconfig program
+<table border="1" style="zebra">
+<tr><th>Name</th><th>Description of value</th></tr>
+<tr><td>HTTPS</td><td>Set to "on" if HTTPS is active</td></tr>
+<tr><td>IN::&lt;header&gt;</td><td>One variable for each input header in request.</td></tr>
+<tr><td>DOCUMENT_URI</td><td>Document path requested</td></tr>
+<tr><td>QUERY_STRING</td><td>What comes after requestpath (after '?').</td></tr>
+<tr><td>method</td><td>GET, POST etc.</td></tr>
+<tr><td>protocol</td><td>0.9, 1.0, 1.1</td></tr>
+<tr><td>servername</td><td>Name of the server according to apache</td></tr>
+<tr><td>useragent_ip</td><td>Client IP address</td></tr>
+<tr><td>useragent_addr</td><td>Client IP address</td></tr>
+<tr><td>local_ip</td><td>Server IP address</td></tr>
+<tr><td>PAERROR</td><td>Set to "1". Only for ReqFilterError.</td></tr>
+<tr><td>status</td><td>Status of the response. Only for ReqFilterError.</td></tr>
+<tr><td>FILENAME</td><td>Absolute path to file. Only for ReqFilterError.</td></tr>
+<tr><td>PROXY_HOST</td><td>Hostname for proxyrequest. Only for ReqFilterError.</td></tr>
+</table>
 
-PAConfig <prg> invoked for each request. Env contains request informaton.
-PAError <prg> invoked if error. Env contains information about failed request.
-PALogLevel (DEBUG|INFO|WARN|ERR)
-
-
-Output from your ReqFilter program:
------------------------------------
-
-DOCUMENT_URI=URI               -- if URI begins with '/' rewrite local path. If not treat as proxy request to URI
-Proxy-reverse-alias=real,fake  -- URI translation of headers when proxying
-Substitute=real,fake           -- replace occurances of <real> with <fake> within the output document
-Proxy-host=HOSTNAME            -- hostname for proxyrequest
-IN::Host=VHOST  -- set incoming host header and switch vhost
-DocumentRoot=PATH -- set document root for request
-Filter=NNN        -- add output filter named 'NNN' to request
-Status=NNN        -- return HTTP status NNN to client
-Redirect=LOC      -- redirect to URI 'LOC'
-Filename=FN       -- serve file 'FN'
-Handler=HHH  -- set handler to HHH
-CGI=FN            -- execute 'FN' as CGI
-Export=NAME=VAL   -- export variable to CGI
-QUERY_STRING=S    -- set HTTP query string to 'S'
-PATH_INFO=PATH    -- set PATH_INFO for CGI.
-IN::NNN=VVV       -- set incoming request header 'NNN' to 'VVV'
-OUT::NNN=VVV      -- set outgoing header 'NNN' to 'VVV'
-ERR::NNN=VVV      -- set outgoing error header 'NNN' to 'VVV' (If status is set to error).
-Log=MSG           -- Log message MSG to apache log
-
-Environment variables set for invoked ReqFilter program
--------------------------------------------------------
-HTTPS            -- Set to "on" if HTTPS is active.
-IN::<header>     -- One variable for each input header in request.
-DOCUMENT_URI     -- Document path requested
-QUERY_STRING     -- What comes after requestpath (after '?').
-method           -- GET, POST etc.
-protocol         -- 0.9, 1.0, 1.1
-servername       -- Name of the server according to apache
-useragent_ip        -- Client IP address
-useragent_addr        -- Client IP address
-local_ip         -- Server IP address
-PAERROR          -- Set to "1". Only for ReqFilterError.
-status           -- Status of the response. Only for ReqFilterError.
-FILENAME         -- Absolute path to file. Only for ReqFilterError.
-PROXY_HOST       -- Hostname for proxyrequest. Only for ReqFilterError.
-
-
+mod_pa reads the output from the paconfig program.
+The following output is handled by mod_pa.
+<table border="1" style="zebra">
+<tr><th>Format</th><th>Description</th></tr>
+<tr><td>DOCUMENT_URI=URI</td><td>if URI begins with '/' rewrite local path. If not treat as proxy request to URI</td></tr>
+<tr><td>Proxy-reverse-alias=real,fake</td><td>URI translation of headers when proxying</td></tr>
+<tr><td>Substitute=real,fake</td><td>replace occurances of real with fake within the output document</td></tr>
+<tr><td>Proxy-host=HOSTNAME</td><td>hostname for proxyrequest</td></tr>
+<tr><td>IN::Host=VHOST</td><td>set incoming host header and switch vhost</td></tr>
+<tr><td>DocumentRoot=PATH</td><td>set document root for request</td></tr>
+<tr><td>Filter=NNN</td><td>add output filter named 'NNN' to request</td></tr>
+<tr><td>Status=NNN</td><td>return HTTP status NNN to client</td></tr>
+<tr><td>Redirect=LOC</td><td>redirect to URI 'LOC'</td></tr>
+<tr><td>Filename=FN</td><td>serve file 'FN'</td></tr>
+<tr><td>Handler=HHH</td><td>set handler to HHH</td></tr>
+<tr><td>CGI=FN</td><td>execute 'FN' as CGI</td></tr>
+<tr><td>Export=NAME=VAL</td><td>export variable to CGI</td></tr>
+<tr><td>QUERY_STRING=S</td><td>set HTTP query string to 'S'</td></tr>
+<tr><td>PATH_INFO=PATH</td><td>set PATH_INFO for CGI.</td></tr>
+<tr><td>IN::NNN=VVV</td><td>set incoming request header 'NNN' to 'VVV'</td></tr>
+<tr><td>OUT::NNN=VVV</td><td>set outgoing header 'NNN' to 'VVV'</td></tr>
+<tr><td>ERR::NNN=VVV</td><td>set outgoing error header 'NNN' to 'VVV' (If status is set to error).</td></tr>
+<tr><td>Log=MSG</td><td>Log message MSG to apache log</td></tr>
+</table>
 
 </usage>
 </directivesynopsis>
