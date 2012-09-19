@@ -45,6 +45,11 @@ int useragent_ip(const char *ip);
 int useragent_net(const char *net);
 
 /*
+ * true if useragent hostname matches
+ */
+int useragent_host(const char *host);
+
+/*
  * Query hostname DNS-format.
  * Example: host("www.aaa.bb")
  */

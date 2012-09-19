@@ -320,6 +320,7 @@ int proxy_host(const char *hostname)
 	return 0;
 }
 
+
 /*
  * Reverse proxy translation
  */
@@ -954,6 +955,41 @@ int useragent_net(const char *net)
 int useragent_ip(const char *ip)
 {
 	return useragent_net(ip);
+}
+
+/*
+ * true if useragent hostname matches
+ */
+int useragent_host(const char *host)
+{
+	const struct sockaddr *sa;
+	struct sockaddr_in in;
+	struct sockaddr_in6 in6;
+	socklen_t salen;
+	unsigned char ip[16];
+	char ua[512];
+
+	if(inet_pton(USERAGENT_AF, USERAGENT_IP, ip)!=1)
+		return 0;
+	if(USERAGENT_AF == AF_INET) {
+		memset(&in,0,sizeof(in));
+		memcpy(&in.sin_addr.s_addr, ip, 4);
+		in.sin_family = AF_INET;
+		sa = &in;
+		salen = sizeof(in);
+	} else {
+		memset(&in6,0,sizeof(in6));
+		memcpy(&in6.sin6_addr.s6_addr, ip, 16);
+		in6.sin6_family = AF_INET6;
+		sa = &in6;
+		salen = sizeof(in6);
+	}
+
+	if(getnameinfo(sa, salen,
+		       ua, sizeof(ua),
+		       NULL, 0, NI_NAMEREQD))
+		return 0;
+	return strcasecmp(host, ua)==0;
 }
 
 
