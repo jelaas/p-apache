@@ -156,7 +156,7 @@ int main(int argc, char **argv)
 	}
 	fclose(pah);
 	
-	fprintf(f, "int main(int argc, char **argv)\n{if(argc>1&&!strcmp(argv[1],\"--date\")){if(write(1,_DATE,strlen(_DATE)) == -1) _exit(2);_exit(0);}if(argc>1&&!strcmp(argv[1],\"--id\")){if(write(1,_ID,strlen(_ID))==-1) _exit(2);_exit(0);}if(argc>1&&!strcmp(argv[1],\"-L\")){if(write(1,_TC,strlen(_TC))==-1) _exit(2);_exit(0);}if(argc>1&&!strcmp(argv[1],\"-D\"))debug();_rf_init();\n#line 0 \"%s\"\n", conf.cfg);
+	fprintf(f, "int main(int argc, char **argv)\n{if(argc>1&&!strcmp(argv[1],\"--date\")){if(write(1,_DATE,strlen(_DATE)) == -1) _exit(2);_exit(0);}if(argc>1&&!strcmp(argv[1],\"--id\")){if(write(1,_ID,strlen(_ID))==-1) _exit(2);_exit(0);}if(argc>1&&!strcmp(argv[1],\"-L\")){if(write(1,_TC,strlen(_TC))==-1) _exit(2);_exit(0);}if(argc>1&&!strcmp(argv[1],\"-D\"))debug();_init();\n#line 0 \"%s\"\n", conf.cfg);
 	
 	cfg = fopen(conf.cfg, "r");
 	if(!cfg) {
