@@ -24,6 +24,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <arpa/inet.h>
 
 #include <pcre.h>
 
@@ -33,6 +34,8 @@
 char recording[NRECORDS][RECSIZE];
 char regex_group[NRECORDS][RECSIZE];
 char *DOCUMENT_URI;
+char *USERAGENT_IP;
+int USERAGENT_AF = AF_INET;
 char *HTTPS;
 char *QUERY_STRING;
 int get, post, head, put, http, https, protocol;
@@ -833,10 +836,11 @@ int timeout(int t)
 	return 0;
 }
 
-void _rf_init()
+void _init()
 {
 	char *method, *proto;
 	DOCUMENT_URI = getenv("DOCUMENT_URI");
+	USERAGENT_IP = getenv("useragent_ip");
 	HTTPS = getenv("HTTPS");
 	QUERY_STRING = getenv("QUERY_STRING");
 	method = getenv("method");
@@ -853,6 +857,10 @@ void _rf_init()
 	if(post+head+put == 0) get=1;
 	if(!DOCUMENT_URI) DOCUMENT_URI="/";
 	if(!QUERY_STRING) QUERY_STRING="";
+	if(!USERAGENT_IP) USERAGENT_IP="";
+	if(USERAGENT_IP) {
+		if(strchr(USERAGENT_IP, ':')) USERAGENT_AF = AF_INET6;
+	}
 }
 
 static int printenv(int fd, const char *env)
@@ -905,6 +913,75 @@ int _msg(const char *message, ...)
 
 	printf("Log=%s%s\n", message, m);
 	return 0;
+}
+
+char *_concat(const char *s, ...)
+{
+	const char *m;
+	va_list ap;
+
+        va_start(ap, s);
+        m = _va_buf(&ap);
+        va_end(ap);
+
+	n = malloc(strlen(s) + strlen(m) +1);
+	strcpy(n, s);
+	strcat(n, m);
+	return n;
+}
+
+/*
+ * true if useragent_ip match net
+ */
+int useragent_net(const char *net)
+{
+        int plen, i;
+        int af = AF_INET;
+        char *p;
+        unsigned char *u;
+        unsigned char mask[16];
+        unsigned char buf[16];
+        unsigned char ip[16];
+        net = strdup(net);
+
+        if(strchr(net, ':')) af = AF_INET6;
+        if(af != USERAGENT_AF) return 0;
+
+        if( (p=strchr(net, '/')) ) {
+                plen = atoi(p+1);
+                *p = 0;
+        } else {
+                plen = af == AF_INET6 ? 128:32;
+        }
+
+        inet_pton(af, net, buf);
+        inet_pton(af, USERAGENT_IP, ip);
+
+        memset(mask, 0, sizeof(mask));
+        for(u=mask,i=0;i<(plen>>3);i++) {
+                *u++ = 0xff;
+        }
+        plen -= (plen & ~7);
+
+        if(plen) {
+                for(i=7;i>=(8-plen);i--) {
+                        *u |= (1<<i);
+                }
+        }
+        for(i=0;i<(af==AF_INET?4:16);i++) {
+                if((ip[i] & mask[i]) != (buf[i] & mask[i])) return 0;
+	}
+
+        return 1;
+}
+
+
+/*
+ * true if useragent_ip match
+ */
+int useragent_ip(const char *ip)
+{
+	return useragent_net(ip);
 }
 
 

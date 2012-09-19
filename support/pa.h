@@ -29,6 +29,22 @@ int _msg( const char *message, ...);
 #define msg(MSG, A...) _msg(MSG, ##A, NULL)
 
 /*
+ * concatenate strings
+ */
+char *_concat(const char *s, ...);
+#define concat(STR, A...) _concat(STR, ##A, NULL)
+
+/*
+ * true if useragent_ip match
+ */
+int useragent_ip(const char *ip);
+
+/*
+ * true if useragent_ip match net
+ */
+int useragent_net(const char *net);
+
+/*
  * Query hostname DNS-format.
  * Example: host("www.aaa.bb")
  */
