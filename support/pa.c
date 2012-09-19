@@ -34,6 +34,7 @@
 char recording[NRECORDS][RECSIZE];
 char regex_group[NRECORDS][RECSIZE];
 char *DOCUMENT_URI;
+char *ORIG_DOCUMENT_URI;
 char *USERAGENT_IP;
 int USERAGENT_AF = AF_INET;
 char *HTTPS;
@@ -325,36 +326,6 @@ int proxy_host(const char *hostname)
 int proxy_reverse(const char *real, const char *fake)
 {
 	printf("Proxy-reverse-alias=%s,%s\n", real, fake);
-	return 0;
-}
-
-/*
- * Proxy request
- */
-int _proxy_to(const char *URI, ...)
-{
-	const char *p;
-	va_list ap;
-	char *buf;
-	size_t bufsize = 1024;
-
-	buf = malloc(bufsize);
-	if(!buf) errout();
-	*buf = 0;
-	
-	va_start(ap, URI);
-	while( (p=va_arg(ap, char *)) ) {
-		if(strlen(buf) + strlen(p) >= bufsize) {
-			bufsize*=2;
-			buf = realloc(buf, bufsize);
-			if(!buf) errout();
-		}
-		strcat(buf, p);
-	}
-	va_end(ap);
-	
-	printf("DOCUMENT_URI=%s%s\n", URI, buf);
-	
 	return 0;
 }
 
@@ -840,6 +811,8 @@ void _init()
 {
 	char *method, *proto;
 	DOCUMENT_URI = getenv("DOCUMENT_URI");
+	if(!DOCUMENT_URI) DOCUMENT_URI="/";
+	ORIG_DOCUMENT_URI = strdup(DOCUMENT_URI);
 	USERAGENT_IP = getenv("useragent_ip");
 	HTTPS = getenv("HTTPS");
 	QUERY_STRING = getenv("QUERY_STRING");
@@ -855,7 +828,6 @@ void _init()
 		if(!strcmp(method, "PUT")) put=1;
 	}
 	if(post+head+put == 0) get=1;
-	if(!DOCUMENT_URI) DOCUMENT_URI="/";
 	if(!QUERY_STRING) QUERY_STRING="";
 	if(!USERAGENT_IP) USERAGENT_IP="";
 	if(USERAGENT_IP) {
@@ -990,6 +962,8 @@ int useragent_ip(const char *ip)
  */
 void done()
 {
+	if(strcmp(DOCUMENT_URI, ORIG_DOCUMENT_URI))
+		printf("DOCUMENT_URI=%s\n", DOCUMENT_URI);
 	fflush(stdout);
 	_exit(0);
 }

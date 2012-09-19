@@ -101,12 +101,6 @@ int proxy_host(const char *hostname);
 int proxy_reverse(const char *real, const char *fake);
 
 /*
- * Proxy request
- */
-int _proxy_to(const char *URI, ...);
-#define proxy_to(URI, A...) _proxy_to(URI,##A, NULL)
-
-/*
  * Path to balancer filesystem storage
  */
 int balancer_storage(const char *path);
