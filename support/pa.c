@@ -399,7 +399,7 @@ int backend(const char *name, const char *uri)
 
 static unsigned int _rf_client_hash()
 {
-	char *u = getenv("remote_ip");
+	char *u = USERAGENT_IP;
 	unsigned int h = 0;
 	if(!u) return 0;
 	
@@ -864,7 +864,7 @@ int dump(const char *fn)
 	if(printenv(fd, "method")) goto out;
 	if(printenv(fd, "protocol")) goto out;
 	if(printenv(fd, "servername")) goto out;
-	if(printenv(fd, "remote_ip")) goto out;
+	if(printenv(fd, "useragent_ip")) goto out;
 	if(printenv(fd, "HTTPS")) goto out;
 	printenv(fd, "local_ip");
 out:
