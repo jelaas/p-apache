@@ -927,8 +927,8 @@ int useragent_net(const char *net)
                 plen = af == AF_INET6 ? 128:32;
         }
 
-        inet_pton(af, net, buf);
-        inet_pton(af, USERAGENT_IP, ip);
+        if(inet_pton(af, net, buf)!=1) return 0;
+        if(inet_pton(af, USERAGENT_IP, ip)) return 0;
 
         memset(mask, 0, sizeof(mask));
         for(u=mask,i=0;i<(plen>>3);i++) {
